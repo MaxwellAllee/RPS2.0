@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Rock Paper Scissors</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/css/style.css" >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.1/firebase.js"></script>
+    
+
+</head>
+<body class="text-light" style="background-color:	#15133B">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <H1 class = "text-center">
+                    Rock, Paper, Scissors, Spock, and Lizard
+                </H1>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12 text-center instruction">
+                <form>
+                    <div class = "form-group">
+                     <input id="player" type="text" placeholder="Display Name" ><input id="playerN" class="btn-secondary" type="submit">
+                    <button id="reset" type="reset">reset</button>
+                </div>
+                  </form>
+                
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <img src="assets/images/Clear.png" id="pht" height="700" width="700" alt="diagram" usemap="#spocks">
+                <map name="spocks">
+                    <area class="guess" shape="circle" coords="154,311,82" alt="paper" data-gues="paper">
+                    <area class="guess" shape="circle" coords="542,311,82" alt="lizard" data-gues="lizard">
+                    <area class="guess" shape="circle" coords="348,163,82" alt="rock" data-gues="rock">
+                    <area class="guess" shape="circle" coords="229,536,82" alt="scissor" data-gues="scissor">
+                    <area class="guess" shape="circle" coords="469,535,82" alt="spock" data-gues="spock">
+                  </map>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 results">
+                
+            </div>
+        </div>
+
+    
+    <script src="main.js"></script>     
+</body>
+</html>
