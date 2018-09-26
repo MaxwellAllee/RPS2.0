@@ -26,6 +26,7 @@ var disconect = {
     playerDos: { guess: "waiting", name: "blank", userId: 0 }, playerUno: { guess: "waiting", name: "blank", userId: 0 }, status: "reset"
 
 }
+var tables
 var outcome = {
     rockpaper: "lose", rockscissor: "win", rocklizard: "win", rockspock: "lose", rockrock: "tie",
     paperrock: "win", paperscissor: "lose", paperlizard: "lose", paperspock: "win", paperpaper: "tie",
@@ -35,10 +36,11 @@ var outcome = {
 }
 
 const userId = Math.floor(100000 + Math.random() * 90000)
-console.log(userId)
+
+$(".card").scrollTop($(".card")[0].scrollHeight);
 var database = firebase.database()
 var ref
-console.log(database)
+
 function game() {
     console.log(playerNam)
     database.ref().on("value", function (snapshot) {
@@ -62,7 +64,8 @@ function game() {
             ref = firebase.database().ref();
             ref.onDisconnect().update(disconect);
             database.ref().child(player).update({
-                userId
+                userId,
+                name: playerNam
             });
 
             console.log("you are player one")
@@ -75,7 +78,8 @@ function game() {
             ref = firebase.database().ref();
             ref.onDisconnect().update(disconect);
             database.ref().child(player).update({
-                userId
+                userId,
+                name: playerNam
             });
 
             console.log("you are player two")
@@ -110,7 +114,7 @@ $("#reset").on("click", function () {
     reset()
 })
 
-$(".guess").on("click", function (event) {
+$(".guess").on("click", function () {
     if (player !== 0) {
         var userChoice = $(this).attr("data-gues")
         database.ref().child(player).update({
@@ -124,6 +128,23 @@ $(".guess").on("click", function (event) {
                 console.log(success)
                 var outcom = outcome[success]
                 $(".results").html("<h2> Your opponent choose " + opponent + " You " + outcom + "!<br> You will be returned to lobby in 5 seconds</h2>")
+                if (player === "playerUno") {
+                    var otherName = snapshot.val().name
+                    if (outcom === "win") {
+                        tables = "<tr><td>" + playerNam + "</td><td>" + otherName + "</td></tr>"
+                    }
+                    else if (outcom === "lose") {
+                        tables = "<tr><td>" + otherName + "</td><td>" + playerNam + "</td></tr>"
+                    }
+                    else if (outcom === "tie") {
+                        tables = "<tr><td>" + otherName + " & " + playerNam + "</td><td></td></tr>"
+                    }
+                    console.log(tables)
+                    database.ref().child("table").push({
+                        rowz: tables
+                    })
+                }
+
                 setTimeout(hardReset, 5000)
             }
 
@@ -174,3 +195,39 @@ function hardReset() {
         setTimeout(game, 1000)
     }
 }
+//Start Chat stuff
+$("#button-addon2").on("click", function (event) {
+    event.preventDefault();
+    var getName
+    var holder = $("#chatTxt").val().trim();
+
+    $('.input-group').children('input').val('')
+    if (player === "playerUno") {
+        getName = '<font color= "red">' + playerNam + ': </font>'
+    }
+    else if (player === "playerDos") {
+        getName = '<font color= "blue">' + playerNam + ': </font>'
+    }
+    else {
+        getName = '<font color= "green">Anonymous: </font>'
+    }
+    holder = getName + holder + "<br>"
+    console.log(holder)
+    database.ref().child("chat").push({
+        chatIn: holder
+    })
+
+})
+
+database.ref().child("chat").on("child_added", function (snapshot) {
+    var snapIt = snapshot.val()
+    console.log(snapIt.chatIn)
+    $("#textHer").append(snapIt.chatIn)
+})
+//table write to Dom
+database.ref().child("table").on("child_added", function (snapshot) {
+    var snapThis = snapshot.val()
+    console.log(snapThis.rowz)
+    $("#tableStuff").append(snapThis.rowz)
+})
+

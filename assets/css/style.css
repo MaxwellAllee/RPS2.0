@@ -8,3 +8,13 @@
 .instruction{
  min-height: 50px
 }
+.card{
+    color: black;
+    min-height: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.boxControl{
+    max-height: 437px;
+    overflow: auto; 
+}

@@ -40,14 +40,22 @@
         </div>
 
         <div class="row">
-            <div class="col-md-4 text-center">
-                <div class="input-group mb-3 ml-4">
-                    <input type="text" class="form-control" placeholder="Enter text" aria-label="Recipient's username"
-                        aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon2">submit</span>
+            <div class="col-md-4">
+                <div class="card ml-4 w-100">
+                    <div class="card-body ">
+                        <blockquote class="blockquote mb-0 scroll">
+                            <div id="textHer"></div>
+                        </blockquote>
                     </div>
                 </div>
+                <form>
+                    <div class="input-group mb-3 ml-4 ">
+                        <input type="text" class="form-control" id="chatTxt" placeholder="enter some text">
+                        <div class="input-group-append">
+                            <button class="btn  btn-secondary" type="submit" id="button-addon2">Button</button>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="col-md-4 text-center picArea">
                 <img src="assets/images/Clear.png" id="pht" height="400" width="400" alt="diagram" usemap="#spocks">
@@ -59,9 +67,24 @@
                     <area class="guess" shape="circle" coords="266,306,48" alt="spock" data-gues="spock">
                 </map>
             </div>
+            <div class="col-md-3  boxControl ">
+                <table class="table table-bordered table-dark">
+                    <thead>
+                        <tr class="bg-primary">
+                            <th scope="col">Winner</th>
+                            <th scope="col">Loser</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tableStuff">
+                        
+                    </tbody>
+
+                </table>
+            </div>
         </div>
         <div class="row">
-            <div class="col-md-12 results">
+            <div class="col-md-12 results text-center">
 
             </div>
         </div>
