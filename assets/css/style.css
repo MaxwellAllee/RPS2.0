@@ -2,3 +2,9 @@
     background-color: aliceblue;
     border: 5px;
 }
+.picArea{
+    min-width: 600px;
+}
+.instruction{
+ min-height: 50px
+}

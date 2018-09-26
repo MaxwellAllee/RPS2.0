@@ -10,9 +10,9 @@ var config = {
     messagingSenderId: "572869490263"
 };
 firebase.initializeApp(config);
-var playCount
+var playerNam
 var activityChck
-var player = 0
+var player
 var otherPlayer
 var swith = true
 var run = false
@@ -20,6 +20,10 @@ var imgs = {
     waiting: "assets/images/waiting.gif",
     play: "assets/images/rockpaperscissorslizardspock_newthumb.png",
     clear: "assets/images/Clear.png"
+
+}
+var disconect = {
+    playerDos: { guess: "waiting", name: "blank", userId: 0 }, playerUno: { guess: "waiting", name: "blank", userId: 0 }, status: "reset"
 
 }
 var outcome = {
@@ -33,23 +37,20 @@ var outcome = {
 const userId = Math.floor(100000 + Math.random() * 90000)
 console.log(userId)
 var database = firebase.database()
+var ref
 console.log(database)
 function game() {
-    console.log("sanity check")
+    console.log(playerNam)
     database.ref().on("value", function (snapshot) {
         var playd = snapshot.val().playerDos.userId
         var playo = snapshot.val().playerUno.userId
-            playcount = snapshot.val().playCount
-           
-            
-        if (playo != 0 && playd != 0 && run&& swith ) {
+        if (snapshot.val().status === "reset") {
+            $(".results").html("<h2> Your opponent opponent has disconnected !<br> You will be returned to lobby in 5 seconds</h2>")
+            setTimeout(start, 5000)
+        }
+        if (playo != 0 && playd != 0 && run && swith) {
             swith = false
-            if (player==="playerUno"){
-            playcount++
-            console.log(playcount)
-             database.ref().update({
-                playCount: playcount
-            });}
+
             $(".instruction").html("<h3>Click the hand that you want to Play</h3>")
             $("#pht").attr("src", imgs.play);
 
@@ -58,49 +59,50 @@ function game() {
             player = "playerUno"
             otherPlayer = "playerDos"
             run = true
+            ref = firebase.database().ref();
+            ref.onDisconnect().update(disconect);
             database.ref().child(player).update({
                 userId
             });
 
             console.log("you are player one")
         }
-        /*if (userId === playd || userId === playo){
-            run = false
-            player=0
-        }*/
+
         else if (playd === 0 && player === 0) {
             player = "playerDos"
             otherPlayer = "playerUno"
             run = true
+            ref = firebase.database().ref();
+            ref.onDisconnect().update(disconect);
             database.ref().child(player).update({
                 userId
             });
 
             console.log("you are player two")
         }
-        else if (player === 0) {
-            console.log("count")
-            playCount = snapshot.val().playCount
-            console.log(playCount)
-            setTimeout(activityCheck, 30000)
-            function activityCheck() {
-                if (playCount === snapshot.val().playCount) {
-                    reset()
-                }
-            }
-        }
 
     });
 }
+function start() {
 
-$("#playerN").on("click", function (event) {
 
-    event.preventDefault();
-    console.log("it")
     $(".instruction").html("<h3>Waiting for opponent</h3>")
     $("#pht").attr("src", imgs.waiting);
+    database.ref().update({
+        status: "normal"
+    })
+    $(".results").html("")
+    player = 0
     game()
+}
+$("#playerN").on("click", function (event) {
+    event.preventDefault();
+    playerNam = $("#player").val().trim();
 
+    if (playerNam === "") {
+        playerNam = "Anonymous"
+    }
+    start()
 })
 
 $("#reset").on("click", function () {
@@ -108,7 +110,7 @@ $("#reset").on("click", function () {
     reset()
 })
 
-$(".guess").on("click", function () {
+$(".guess").on("click", function (event) {
     if (player !== 0) {
         var userChoice = $(this).attr("data-gues")
         database.ref().child(player).update({
@@ -130,18 +132,14 @@ $(".guess").on("click", function () {
 })
 function reset() {
     console.log("here")
-
-
     database.ref().child("playerDos").update({
         guess: "waiting",
         userId: 0,
-
     });
     database.ref().child("playerUno").update({
         guess: "waiting",
         userId: 0
     });
-
     player = 0
 }
 function hardReset() {
@@ -160,8 +158,6 @@ function hardReset() {
 
         });
         $(".results").html("")
-        playo = 0
-        playd = 0
         player = 0
         swith = true
         $(".instruction").html("<h3>Waiting for opponent</h3>")
@@ -170,12 +166,11 @@ function hardReset() {
     }
     else {
         $(".results").html("")
-        playo = 0
-        playd = 0
         player = 0
         swith = true
         $(".instruction").html("<h3>Waiting for opponent</h3>")
         $("#pht").attr("src", imgs.waiting);
-        
+
         setTimeout(game, 1000)
-    }}
+    }
+}
