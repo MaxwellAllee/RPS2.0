@@ -1,5 +1,3 @@
-
-
 // Initialize Firebase
 var config = {
     apiKey: "AIzaSyBcST_OgbzrGCdLvI9OjnhYfiajoag5-Pw",
@@ -18,42 +16,35 @@ var otherPlayer
 var nextStep = false
 var swith = false
 var run = false
-var imgs = {
+var imgs = { //how the main images are stored
     waiting: "assets/images/waiting.gif",
     play: "assets/images/rockpaperscissorslizardspock_newthumb.png",
     clear: "assets/images/Clear.png"
 
 }
-var checkIt = "reset"
-var noRepeat = false
-var disconnect = {
+var checkIt = "reset"//part of the way to prevent refreshing to soon
+var noRepeat = false //part of the way to prevent refreshing to soon
+var disconnect = {//this is what used to reset database data
     playerDos: { guess: "waiting", name: "blank", userId: 0 },
     playerUno: { guess: "waiting", name: "blank", userId: 0 },
     status: checkIt
 
 }
-var tables
-var outcome = {
+var tables//where the table info is stored
+var outcome = {//object where outcomes are checked
     rockpaper: "lose", rockscissor: "win", rocklizard: "win", rockspock: "lose", rockrock: "tie",
     paperrock: "win", paperscissor: "lose", paperlizard: "lose", paperspock: "win", paperpaper: "tie",
     scissorrock: "lose", scissorpaper: "win", scissorlizard: "win", scissorspock: "lose", scissorscissor: "tie",
     lizardrock: "lose", lizardpaper: "win", lizardscissor: "lose", lizardspock: "win", lizardlizard: "tie",
     spockrock: "win", spockpaper: "lose", spockscissor: "win", spocklizard: "lose", spockspock: "tie"
 }
-
-const userId = Math.floor(100000 + Math.random() * 90000)
-
-var database = firebase.database()
+const userId = Math.floor(100000 + Math.random() * 90000)//unique identifier for each user
+var database = firebase.database()//storing database
 var ref
-
-
-console.log(playerNam)
 database.ref().on("value", function (snapshot) {
-    var playd = snapshot.val().playerDos.userId
-    var playo = snapshot.val().playerUno.userId
-    console.log("playd", playd)
-    console.log("playo", playo)
-    if (snapshot.val().safety === "reset" && noRepeat && snapshot.val().status === "reset") {
+    var playd = snapshot.val().playerDos.userId//stores Dos player data
+    var playo = snapshot.val().playerUno.userId//stores uno player data
+    if (snapshot.val().safety === "reset" && noRepeat && snapshot.val().status === "reset") { // checks to see if opponent has disconnected
         outcom = "reset"
         database.ref().update({
             status: "normal"
@@ -61,16 +52,15 @@ database.ref().on("value", function (snapshot) {
         localStorage.setItem("passingThis", outcom);
             location.href = 'exit.html'
     }
-    if (playo != 0 && playd != 0 && swith) {
+    if (playo != 0 && playd != 0 && swith) {//shows the actual game image and sets it up so clicks are being listened for 
         swith = false
         nextStep = true
 
         $(".instruction").html("<h3>Click the hand that you want to Play</h3>")
         $("#pht").attr("src", imgs.play);
-
     }
-    if (playo === 0 && player === 0 && run) {
-        database.ref().update({
+    if (playo === 0 && player === 0 && run) {//sees if playerUno postions is available
+        database.ref().update({//sets it up so game will be reset if user exits unexpectedly
             safety: "reset"
         })
         noRepeat = true
@@ -85,11 +75,10 @@ database.ref().on("value", function (snapshot) {
             name: playerNam
         });
 
-        console.log("you are player one")
     }
 
-    else if (playd === 0 && player === 0 && run) {
-        database.ref().update({
+    else if (playd === 0 && player === 0 && run) {//sees if playerDos position is available
+        database.ref().update({//sets it up so game will be reset user exits unexpectedly
             safety: "reset"
         })
         noRepeat = true
@@ -103,23 +92,15 @@ database.ref().on("value", function (snapshot) {
             userId,
             name: playerNam
         });
-
-        console.log("you are player two")
     }
-
 });
-
 function start() {
-
-
-    $(".instruction").html("<h3>Waiting for opponent</h3>")
+    $(".instruction").html("<h3>Waiting for opponent</h3>") // changes to waiting stage
     $("#pht").attr("src", imgs.waiting);
 
     $(".results").html("")
     player = 0
     run = true
-    console.log("run " + run)
-    console.log("player " + player)
     database.ref().update({
         status: userId
     })
@@ -134,11 +115,6 @@ $("#playerN").on("click", function (event) {
     start()
 })
 
-$("#reset").on("click", function () {
-
-    reset()
-})
-
 $(".guess").on("click", function () {
     if (nextStep) {
         checkIt = "normal"
@@ -150,17 +126,10 @@ $(".guess").on("click", function () {
             database.ref().update({
                 safety: "check"
             })
-
-            console.log(checkIt)
-            console.log(noRepeat)
-
-
             if (snapshot.val().guess !== "waiting") {
                 noRepeat = false
                 var opponent = snapshot.val().guess
                 var success = userChoice + opponent
-
-                console.log(success)
                 outcom = outcome[success]
                 if (player === "playerUno") {
                     var otherName = snapshot.val().name
@@ -173,19 +142,21 @@ $(".guess").on("click", function () {
                     else if (outcom === "tie") {
                         tables = "<tr><td>" + otherName + " & " + playerNam + "</td><td></td></tr>"
                     }
-                    console.log(tables)
                     database.ref().child("table").push({
                         rowz: tables
                     })
                 }
                  // this is section is divided since I am using the same location to store and playing game on one computer
+                
+                if (outcom === "win"){
                 localStorage.setItem("passingThis", outcom);
                
-                if (outcom === "win")
-                    location.href = 'exit.html'
+                    location.href = 'exit.html'}
                 else {
-                    setTimeout(myFunction, 2000)
+                    setTimeout(myFunction, 3000)
                     function myFunction() {
+                        localStorage.setItem("passingThis", outcom);
+               
                         location.href = 'exit.html'
                     }
                 }
@@ -193,52 +164,7 @@ $(".guess").on("click", function () {
         })
     }
 })
-function reset() {
-    console.log("here")
-    database.ref().update(disconnect);
-}
-/*function hardReset() {
 
-
-    if (player === "playerUno") {
-        console.log("why")
-        database.ref().update(disconnect);
-        $(".results").html("")
-        player = 0
-      
-        $(".instruction").html("<h3>Waiting for opponent</h3>")
-        $("#pht").attr("src", imgs.waiting);
-        start()
-    }
-    else {
-        $(".results").html("")
-        player = 0
-        $(".instruction").html("<h3>Waiting for opponent</h3>")
-        $("#pht").attr("src", imgs.waiting);
-        
-        start()
-    }
-
-
-    if (player === "playerUno") {
-        console.log("why")
-        database.ref().update(disconnect);
-        $(".results").html("")
-        player = 0
-      
-        $(".instruction").html("<h3>Waiting for opponent</h3>")
-        $("#pht").attr("src", imgs.waiting);
-        start()
-    }
-    else {
-        $(".results").html("")
-        player = 0
-        $(".instruction").html("<h3>Waiting for opponent</h3>")
-        $("#pht").attr("src", imgs.waiting);
-        
-        start()
-    }
-}*/
 //Start Chat stuff
 $("#button-addon2").on("click", function (event) {
     event.preventDefault();
@@ -256,7 +182,6 @@ $("#button-addon2").on("click", function (event) {
         getName = '<font color= "green">Anonymous: </font>'
     }
     holder = getName + holder + "<br>"
-    console.log(holder)
     database.ref().child("chat").push({
         chatIn: holder
     })
@@ -265,13 +190,11 @@ $("#button-addon2").on("click", function (event) {
 
 database.ref().child("chat").on("child_added", function (snapshot) {
     var snapIt = snapshot.val()
-    console.log(snapIt.chatIn)
     $("#textHer").append(snapIt.chatIn)
 })
 //table write to Dom
 database.ref().child("table").on("child_added", function (snapshot) {
     var snapThis = snapshot.val()
-    console.log(snapThis.rowz)
     $("#tableStuff").append(snapThis.rowz)
 })
 
